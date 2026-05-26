@@ -115,6 +115,83 @@
             50% { transform: scale(1); }
         }
 
+        /* Love Probability Button Styles */
+        .love-probability-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e72 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px 0;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .love-probability-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .love-probability-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Love Result Display */
+        .love-result {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e72 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .love-result.show {
+            display: block;
+        }
+
+        .love-result .percentage {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .love-result .message {
+            font-size: 1.3em;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .love-hearts {
+            font-size: 2em;
+            margin: 15px 0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 2em;
@@ -127,6 +204,10 @@
             .section h2 {
                 font-size: 1.3em;
             }
+
+            .love-result .percentage {
+                font-size: 2.5em;
+            }
         }
     </style>
 </head>
@@ -138,6 +219,20 @@
         </div>
 
         <div class="content">
+            <!-- Love Probability Section -->
+            <div class="section">
+                <h2>Test Your Love Compatibility! <span class="heart">💕</span></h2>
+                <p>Click the button below to calculate your love probability:</p>
+                <button class="love-probability-btn" onclick="calculateLoveProbability()">💘 Calculate Love Probability 💘</button>
+                
+                <div class="love-result" id="loveResult">
+                    <div class="love-hearts">💕 ✨ 💕</div>
+                    <div class="percentage" id="percentageValue">0%</div>
+                    <div class="message" id="resultMessage">Calculating love...</div>
+                    <div class="love-hearts">💕 ✨ 💕</div>
+                </div>
+            </div>
+
             <div class="message-box">
                 <p>Sometimes the people we care about need time and space, but there are ways to reconnect with them.</p>
             </div>
@@ -216,5 +311,46 @@
             <p>Created with care <span class="heart">❤️</span> | Good luck on your journey!</p>
         </div>
     </div>
+
+    <script>
+        function calculateLoveProbability() {
+            // Generate random love probability between 30% and 100%
+            const probability = Math.floor(Math.random() * 71) + 30;
+            
+            // Messages for different probability ranges
+            const messages = {
+                30: ["There's potential! Keep trying! 💪", "The spark is there! ✨"],
+                40: ["Growing feelings! 💗", "There's hope! Keep going!"],
+                50: ["It's a match! 🎯", "50/50 chance of true love!"],
+                60: ["Strong connection! 🔥", "The chemistry is real!"],
+                70: ["Very promising! 💑", "True love is near!"],
+                80: ["Destiny calling! 🌟", "Amazing compatibility!"],
+                90: ["You were meant to be! 👑", "This is meant to happen!"],
+                100: ["100% PERFECT MATCH! 🎊🎉", "True love awaits! 👰💒"]
+            };
+
+            // Select appropriate message based on percentage
+            let messageKey = Math.floor(probability / 10) * 10;
+            if (messageKey > 90) messageKey = 90;
+            if (messageKey < 30) messageKey = 30;
+            
+            const messageList = messages[messageKey];
+            const selectedMessage = messageList[Math.floor(Math.random() * messageList.length)];
+
+            // Display result with animation
+            const resultDiv = document.getElementById('loveResult');
+            const percentageDiv = document.getElementById('percentageValue');
+            const messageDiv = document.getElementById('resultMessage');
+
+            // Clear animation by removing and re-adding the class
+            resultDiv.classList.remove('show');
+            
+            setTimeout(() => {
+                percentageDiv.textContent = probability + '%';
+                messageDiv.textContent = selectedMessage;
+                resultDiv.classList.add('show');
+            }, 100);
+        }
+    </script>
 </body>
 </html>

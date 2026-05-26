@@ -82,6 +82,7 @@
             border-radius: 8px;
             border-left: 4px solid #667eea;
             transition: transform 0.3s ease;
+            cursor: pointer;
         }
 
         .trait-card:hover {
@@ -93,6 +94,164 @@
             color: #764ba2;
             display: block;
             margin-bottom: 8px;
+        }
+
+        /* Friend Checker Tool Styles */
+        .friend-checker {
+            background: #f0f4ff;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .checker-input-group {
+            margin-bottom: 15px;
+        }
+
+        .checker-input-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .checker-input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .checker-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+            background-color: #fafbff;
+        }
+
+        .checklist-questions {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .checklist-item:hover {
+            background-color: #f0f4ff;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checklist-item label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 0.95em;
+        }
+
+        .checker-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .checker-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .checker-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Friend Compatibility Score */
+        .compatibility-result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .compatibility-result.show {
+            display: block;
+        }
+
+        .compatibility-result .friend-names {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .compatibility-score {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .compatibility-message {
+            font-size: 1.2em;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score-hearts {
+            font-size: 2em;
+            margin: 15px 0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
         .red-flags {
@@ -200,6 +359,10 @@
             header {
                 padding: 40px 20px;
             }
+
+            .compatibility-score {
+                font-size: 2.5em;
+            }
         }
     </style>
 </head>
@@ -211,9 +374,78 @@
         </header>
 
         <main>
+            <!-- Friend Compatibility Checker Section -->
+            <section>
+                <h2>Check Your Friendship Compatibility 💙</h2>
+                <div class="friend-checker">
+                    <div class="checker-input-group">
+                        <label for="yourName">Your Name:</label>
+                        <input type="text" id="yourName" placeholder="Enter your name" />
+                    </div>
+                    <div class="checker-input-group">
+                        <label for="friendName">Friend's Name:</label>
+                        <input type="text" id="friendName" placeholder="Enter your friend's name" />
+                    </div>
+
+                    <h3>Rate Your Friendship (Select how many apply):</h3>
+                    <div class="checklist-questions">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check1" value="1" />
+                            <label for="check1">They listen without judgment</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check2" value="1" />
+                            <label for="check2">They remember important details about me</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check3" value="1" />
+                            <label for="check3">They celebrate my successes</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check4" value="1" />
+                            <label for="check4">They're honest with me</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check5" value="1" />
+                            <label for="check5">They make time for me</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check6" value="1" />
+                            <label for="check6">They support my decisions</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check7" value="1" />
+                            <label for="check7">They don't gossip about me</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check8" value="1" />
+                            <label for="check8">They're consistent and reliable</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check9" value="1" />
+                            <label for="check9">They show genuine empathy</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check10" value="1" />
+                            <label for="check10">They respect my boundaries</label>
+                        </div>
+                    </div>
+
+                    <button class="checker-btn" onclick="calculateFriendshipScore()">🤝 Calculate Friendship Score 🤝</button>
+
+                    <div class="compatibility-result" id="compatibilityResult">
+                        <div class="score-hearts">💙 ✨ 💙</div>
+                        <div class="friend-names" id="friendshipNames"></div>
+                        <div class="compatibility-score" id="scoreValue">0%</div>
+                        <div class="compatibility-message" id="scoreMessage">Calculating friendship...</div>
+                        <div class="score-hearts">💙 ✨ 💙</div>
+                    </div>
+                </div>
+            </section>
+
             <section>
                 <h2>What is a True Friend?</h2>
-                <p>A true friend is someone who stands by you through thick and thin. They are honest, loyal, and genuinely care about your well-being. True friendship is rare and precious—it's built on mutual respect, trust, and authentic connection.</p>
+                <p>A true friend is someone who stands by you through thick and thin. They are honest, loyal, and genuinely care about your well-being. True friendship is rare and precious—it's one of the most valuable connections you can have.</p>
                 <div class="quote">
                     "A true friend is one soul in two bodies." — Aristotle
                 </div>
@@ -323,7 +555,7 @@
                 <div class="quote">
                     "In the end, we will remember not the words of our enemies, but the silence of our friends." — Martin Luther King Jr.
                 </div>
-                <p>Finding a true friend is one of life's greatest treasures. It requires patience, authenticity, and the willingness to be vulnerable. Be kind to those around you, invest in relationships that matter, and remember that true friendship is a two-way street. When you find that rare connection, nurture it with care and gratitude.</p>
+                <p>Finding a true friend is one of life's greatest treasures. It requires patience, authenticity, and the willingness to be vulnerable. Be kind to those around you, invest in relationships that matter, and treasure the genuine friendships you've built. True friends are rare gems—cherish them.</p>
             </section>
         </main>
 
@@ -332,5 +564,75 @@
             <p style="font-size: 0.9em; margin-top: 15px;">Created with love. Remember: quality friendships enrich our lives beyond measure.</p>
         </footer>
     </div>
+
+    <script>
+        function calculateFriendshipScore() {
+            const yourName = document.getElementById('yourName').value.trim();
+            const friendName = document.getElementById('friendName').value.trim();
+
+            // Validation
+            if (!yourName || !friendName) {
+                alert('Please enter both names! 💙');
+                return;
+            }
+
+            // Count checked boxes
+            let checkedCount = 0;
+            const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    checkedCount++;
+                }
+            });
+
+            // Calculate percentage (out of 10 items)
+            const score = Math.round((checkedCount / 10) * 100);
+
+            // Messages for different score ranges
+            const scoreMessages = {
+                90: ["Perfect Best Friends! 👑", "You have an amazing friendship!"],
+                80: ["Excellent Friends! 🌟", "This is a strong friendship bond!"],
+                70: ["Very Good Friends! 💪", "You have a solid friendship!"],
+                60: ["Good Friends 🙂", "A decent friendship with potential!"],
+                50: ["Fair Friends 🤔", "There's room for growth and trust."],
+                40: ["Questionable Friendship ⚠️", "You may want to reconsider this friendship."],
+                30: ["Weak Connection 😞", "This friendship needs serious work or may not be genuine."],
+                0: ["Not Yet Friends 🤷", "Time to get to know each other better!"]
+            };
+
+            // Select appropriate message
+            let messageKey = Math.floor(score / 10) * 10;
+            if (messageKey > 90) messageKey = 90;
+
+            const messageList = scoreMessages[messageKey] || scoreMessages[0];
+            const selectedMessage = messageList[0];
+
+            // Display result
+            const resultDiv = document.getElementById('compatibilityResult');
+            const namesDiv = document.getElementById('friendshipNames');
+            const scoreDiv = document.getElementById('scoreValue');
+            const messageDiv = document.getElementById('scoreMessage');
+
+            resultDiv.classList.remove('show');
+
+            setTimeout(() => {
+                namesDiv.textContent = `${yourName} & ${friendName}`;
+                scoreDiv.textContent = score + '%';
+                messageDiv.textContent = selectedMessage;
+                resultDiv.classList.add('show');
+
+                // Scroll to result
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        // Allow Enter key to calculate
+        document.getElementById('yourName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateFriendshipScore();
+        });
+        document.getElementById('friendName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateFriendshipScore();
+        });
+    </script>
 </body>
 </html>

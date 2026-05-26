@@ -115,6 +115,49 @@
             50% { transform: scale(1); }
         }
 
+        /* Input Form Styles */
+        .input-form {
+            background: #f8f9ff;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+            background-color: #fafbff;
+        }
+
+        .form-group input::placeholder {
+            color: #999;
+        }
+
         /* Love Probability Button Styles */
         .love-probability-btn {
             background: linear-gradient(135deg, #ff6b6b 0%, #ff8e72 100%);
@@ -140,6 +183,12 @@
             transform: translateY(-1px);
         }
 
+        .love-probability-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         /* Love Result Display */
         .love-result {
             background: linear-gradient(135deg, #ff6b6b 0%, #ff8e72 100%);
@@ -155,6 +204,13 @@
 
         .love-result.show {
             display: block;
+        }
+
+        .love-result .couple-names {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         .love-result .percentage {
@@ -208,6 +264,10 @@
             .love-result .percentage {
                 font-size: 2.5em;
             }
+
+            .form-group input {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -219,14 +279,28 @@
         </div>
 
         <div class="content">
-            <!-- Love Probability Section -->
+            <!-- Love Probability Section with Name Input -->
             <div class="section">
                 <h2>Test Your Love Compatibility! <span class="heart">💕</span></h2>
-                <p>Click the button below to calculate your love probability:</p>
+                
+                <!-- Input Form -->
+                <div class="input-form">
+                    <div class="form-group">
+                        <label for="userName">Your Name:</label>
+                        <input type="text" id="userName" placeholder="Enter your name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="loverName">Lover's Name:</label>
+                        <input type="text" id="loverName" placeholder="Enter your lover's name" />
+                    </div>
+                </div>
+
+                <p>Fill in your names and click below to calculate your love probability:</p>
                 <button class="love-probability-btn" onclick="calculateLoveProbability()">💘 Calculate Love Probability 💘</button>
                 
                 <div class="love-result" id="loveResult">
                     <div class="love-hearts">💕 ✨ 💕</div>
+                    <div class="couple-names" id="coupleNames"></div>
                     <div class="percentage" id="percentageValue">0%</div>
                     <div class="message" id="resultMessage">Calculating love...</div>
                     <div class="love-hearts">💕 ✨ 💕</div>
@@ -314,6 +388,15 @@
 
     <script>
         function calculateLoveProbability() {
+            const userName = document.getElementById('userName').value.trim();
+            const loverName = document.getElementById('loverName').value.trim();
+
+            // Validation
+            if (!userName || !loverName) {
+                alert('Please enter both your name and your lover\'s name! 💕');
+                return;
+            }
+
             // Generate random love probability between 30% and 100%
             const probability = Math.floor(Math.random() * 71) + 30;
             
@@ -339,6 +422,7 @@
 
             // Display result with animation
             const resultDiv = document.getElementById('loveResult');
+            const coupleNamesDiv = document.getElementById('coupleNames');
             const percentageDiv = document.getElementById('percentageValue');
             const messageDiv = document.getElementById('resultMessage');
 
@@ -346,11 +430,23 @@
             resultDiv.classList.remove('show');
             
             setTimeout(() => {
+                coupleNamesDiv.textContent = `${userName} 💕 ${loverName}`;
                 percentageDiv.textContent = probability + '%';
                 messageDiv.textContent = selectedMessage;
                 resultDiv.classList.add('show');
+                
+                // Scroll to result
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
         }
+
+        // Allow Enter key to calculate
+        document.getElementById('userName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateLoveProbability();
+        });
+        document.getElementById('loverName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateLoveProbability();
+        });
     </script>
 </body>
 </html>

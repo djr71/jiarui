@@ -196,6 +196,31 @@
             transform: none;
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 120px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
         /* Friend Compatibility Score */
         .compatibility-result {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -232,6 +257,22 @@
             font-weight: 500;
         }
 
+        .detailed-analysis {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 0.95em;
+            line-height: 1.8;
+        }
+
+        .detailed-analysis strong {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -243,15 +284,55 @@
             }
         }
 
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
         .score-hearts {
             font-size: 2em;
             margin: 15px 0;
             animation: float 3s ease-in-out infinite;
         }
 
+        .score-hearts.perfect {
+            animation: pulse 0.6s ease infinite;
+        }
+
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
+        }
+
+        .history-section {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .history-item {
+            background: white;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+
+        .history-item button:hover {
+            background: #c0392b;
         }
 
         .red-flags {
@@ -363,6 +444,14 @@
             .compatibility-score {
                 font-size: 2.5em;
             }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                min-width: unset;
+            }
         }
     </style>
 </head>
@@ -434,12 +523,23 @@
                     <button class="checker-btn" onclick="calculateFriendshipScore()">🤝 Calculate Friendship Score 🤝</button>
 
                     <div class="compatibility-result" id="compatibilityResult">
-                        <div class="score-hearts">💙 ✨ 💙</div>
+                        <div class="score-hearts" id="resultHearts">💙 ✨ 💙</div>
                         <div class="friend-names" id="friendshipNames"></div>
                         <div class="compatibility-score" id="scoreValue">0%</div>
                         <div class="compatibility-message" id="scoreMessage">Calculating friendship...</div>
-                        <div class="score-hearts">💙 ✨ 💙</div>
+                        <div class="detailed-analysis" id="detailedAnalysis"></div>
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="shareResult()">📤 Share Result</button>
+                            <button class="action-btn" onclick="resetForm()">🔄 Reset</button>
+                        </div>
                     </div>
+                </div>
+
+                <!-- History Section -->
+                <div class="history-section" id="historySection" style="display:none;">
+                    <h3>📋 Calculation History</h3>
+                    <div id="historyList"></div>
+                    <button class="action-btn" onclick="clearHistory()" style="margin-top: 10px; background: #e74c3c; width: 100%;">Clear History</button>
                 </div>
             </section>
 
@@ -566,6 +666,85 @@
     </div>
 
     <script>
+        // Load history from localStorage
+        function loadHistory() {
+            const history = localStorage.getItem('friendshipHistory');
+            return history ? JSON.parse(history) : [];
+        }
+
+        // Save history to localStorage
+        function saveHistory(history) {
+            localStorage.setItem('friendshipHistory', JSON.stringify(history));
+            displayHistory();
+        }
+
+        // Display calculation history
+        function displayHistory() {
+            const history = loadHistory();
+            const historySection = document.getElementById('historySection');
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historySection.style.display = 'none';
+                return;
+            }
+            
+            historySection.style.display = 'block';
+            historyList.innerHTML = history.map((item, index) => `
+                <div class="history-item">
+                    <span><strong>${item.names}</strong> - ${item.score}% (${new Date(item.timestamp).toLocaleDateString()})</span>
+                    <button onclick="removeHistoryItem(${index})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        // Remove history item
+        function removeHistoryItem(index) {
+            const history = loadHistory();
+            history.splice(index, 1);
+            saveHistory(history);
+        }
+
+        // Clear all history
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all history?')) {
+                localStorage.removeItem('friendshipHistory');
+                document.getElementById('historySection').style.display = 'none';
+            }
+        }
+
+        // Get detailed analysis based on score
+        function getDetailedAnalysis(score, checkedCount) {
+            const strengths = [];
+            const improvements = [];
+
+            if (checkedCount >= 8) {
+                strengths.push('✓ Excellent foundation of trust and communication');
+                strengths.push('✓ Strong mutual respect and understanding');
+            }
+            if (checkedCount >= 6) {
+                strengths.push('✓ Solid friendship with good compatibility');
+            }
+            if (checkedCount <= 4) {
+                improvements.push('💡 Focus on building more open communication');
+                improvements.push('💡 Work on showing more appreciation and reliability');
+            }
+            if (checkedCount <= 2) {
+                improvements.push('💡 Consider if this friendship aligns with your values');
+            }
+
+            let analysis = '';
+            if (strengths.length > 0) {
+                analysis += `<strong>Friendship Strengths:</strong><br>${strengths.join('<br>')}`;
+            }
+            if (improvements.length > 0) {
+                if (analysis) analysis += '<br><br>';
+                analysis += `<strong>Areas to Develop:</strong><br>${improvements.join('<br>')}`;
+            }
+
+            return analysis;
+        }
+
         function calculateFriendshipScore() {
             const yourName = document.getElementById('yourName').value.trim();
             const friendName = document.getElementById('friendName').value.trim();
@@ -588,8 +767,9 @@
             // Calculate percentage (out of 10 items)
             const score = Math.round((checkedCount / 10) * 100);
 
-            // Messages for different score ranges
+            // Messages for different score ranges - NOW INCLUDES 100%!
             const scoreMessages = {
+                100: ["💯 SOULMATE LEVEL FRIENDSHIP! 👑✨", "This is once-in-a-lifetime friendship perfection!"],
                 90: ["Perfect Best Friends! 👑", "You have an amazing friendship!"],
                 80: ["Excellent Friends! 🌟", "This is a strong friendship bond!"],
                 70: ["Very Good Friends! 💪", "You have a solid friendship!"],
@@ -602,16 +782,20 @@
 
             // Select appropriate message
             let messageKey = Math.floor(score / 10) * 10;
-            if (messageKey > 90) messageKey = 90;
+            if (score === 100) messageKey = 100;
+            else if (messageKey > 90) messageKey = 90;
 
             const messageList = scoreMessages[messageKey] || scoreMessages[0];
             const selectedMessage = messageList[0];
+            const detailedMessage = messageList[1];
 
             // Display result
             const resultDiv = document.getElementById('compatibilityResult');
             const namesDiv = document.getElementById('friendshipNames');
             const scoreDiv = document.getElementById('scoreValue');
             const messageDiv = document.getElementById('scoreMessage');
+            const analysisDiv = document.getElementById('detailedAnalysis');
+            const heartsDiv = document.getElementById('resultHearts');
 
             resultDiv.classList.remove('show');
 
@@ -619,11 +803,57 @@
                 namesDiv.textContent = `${yourName} & ${friendName}`;
                 scoreDiv.textContent = score + '%';
                 messageDiv.textContent = selectedMessage;
+                analysisDiv.innerHTML = `<strong>${detailedMessage}</strong><br><br>${getDetailedAnalysis(score, checkedCount)}`;
+                
+                // Special animation for perfect score
+                if (score === 100) {
+                    heartsDiv.classList.add('perfect');
+                    heartsDiv.textContent = '💯 💙 👑 💙 💯';
+                } else {
+                    heartsDiv.classList.remove('perfect');
+                    heartsDiv.textContent = '💙 ✨ 💙';
+                }
+
                 resultDiv.classList.add('show');
+
+                // Save to history
+                const history = loadHistory();
+                history.unshift({
+                    names: `${yourName} & ${friendName}`,
+                    score: score,
+                    timestamp: new Date().toISOString()
+                });
+                saveHistory(history);
 
                 // Scroll to result
                 resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
+        }
+
+        function shareResult() {
+            const scoreValue = document.getElementById('scoreValue').textContent;
+            const friendNames = document.getElementById('friendshipNames').textContent;
+            const message = document.getElementById('scoreMessage').textContent;
+            
+            const shareText = `🤝 Friendship Compatibility Result!\n\n${friendNames}\nScore: ${scoreValue}\n\n"${message}"\n\nCheck your friendship compatibility! 💙`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: '💙 Friendship Compatibility',
+                    text: shareText
+                }).catch(err => console.log('Share cancelled'));
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareText);
+                alert('✅ Result copied to clipboard!\n\n' + shareText);
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('yourName').value = '';
+            document.getElementById('friendName').value = '';
+            document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.getElementById('compatibilityResult').classList.remove('show');
         }
 
         // Allow Enter key to calculate
@@ -633,6 +863,9 @@
         document.getElementById('friendName').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') calculateFriendshipScore();
         });
+
+        // Load history on page load
+        window.addEventListener('load', displayHistory);
     </script>
 </body>
 </html>
